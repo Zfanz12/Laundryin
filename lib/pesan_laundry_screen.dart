@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'konfirmasi_pesanan.dart';
 
 // ====================================================================
 // HALAMAN PESAN LAUNDRY (Pesan Laundry Remake - Figma #293:1587)
@@ -437,16 +436,17 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
         ),
         const SizedBox(height: 14),
 
-        // 4 Kartu Kategori Sejajar (Lebar dibagi rata, Persis Figma)
-        Row(
-          children: List.generate(daftarKategori.length, (indeks) {
-            final nama = daftarKategori[indeks]['nama'] as String;
-            final ikon = daftarKategori[indeks]['ikon'] as IconData;
-            final isDipilih = kategoriTerpilih.contains(nama);
-            final isTerakhir = (indeks == daftarKategori.length - 1);
+        // Baris Item yang Bisa Di-scroll Horizontal
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            children: daftarKategori.map((item) {
+              final nama = item['nama'] as String;
+              final ikon = item['ikon'] as IconData;
+              final isDipilih = kategoriTerpilih.contains(nama);
 
-            return Expanded(
-              child: GestureDetector(
+              return GestureDetector(
                 onTap: () {
                   setState(() {
                     if (isDipilih) {
@@ -459,19 +459,20 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                     }
                   });
                 },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  height: 96,
-                  margin: EdgeInsets.only(right: isTerakhir ? 0 : 10),
+                child: Container(
+                  width: 128,
+                  height: 112,
+                  margin: const EdgeInsets.only(right: 9),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isDipilih
-                          ? const Color(0xFF0040A1)
-                          : Colors.transparent,
-                      width: 1.8,
-                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    border: isDipilih
+                        ? Border.all(
+                            color: const Color(0xFF0040A1),
+                            width: 1.8,
+                          )
+                        : null,
                     boxShadow: [
                       BoxShadow(
                         color: isDipilih
@@ -485,29 +486,29 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Kotak Ikon (40x40, borderRadius 14)
+                      // Kotak Ikon (48x48, borderRadius 16)
                       Container(
-                        width: 40,
-                        height: 40,
+                        width: 48,
+                        height: 48,
                         decoration: BoxDecoration(
                           color: isDipilih
                               ? const Color(0xFFEFF6FF)
                               : const Color(0xFFF3F4F5),
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                         child: Icon(
                           ikon,
                           color: isDipilih
                               ? const Color(0xFF0040A1)
                               : const Color(0xFF424654),
-                          size: 20,
+                          size: 22,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
                       Text(
                         nama,
                         style: GoogleFonts.plusJakartaSans(
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight:
                               isDipilih ? FontWeight.w700 : FontWeight.w600,
                           color: isDipilih
@@ -518,9 +519,9 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                     ],
                   ),
                 ),
-              ),
-            );
-          }),
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
@@ -535,7 +536,7 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
       children: [
         // Judul Bagian
         Text(
-          'ALAMAT',
+          'Alamat',
           style: GoogleFonts.plusJakartaSans(
             fontSize: 12,
             fontWeight: FontWeight.w700,
@@ -850,8 +851,8 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
               setState(() {
                 skalaTombolAksi = 1.0;
               });
-              // Pindah ke Halaman Konfirmasi (Pesanan Diterima!)
-              keHalamanKonfirmasi();
+              // Tampilkan dialog feedback pesanan berhasil dibuat (front-end dummy)
+              tampilkanModalKonfirmasiPesanan();
             },
             onTapCancel: () {
               setState(() {
@@ -908,17 +909,88 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
     );
   }
 
-  // Navigasi ke Halaman Konfirmasi Pesanan (Screen konfirmasi Remake)
-  // pushReplacement: tombol back di halaman konfirmasi tidak kembali ke form
-  void keHalamanKonfirmasi() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const HalamanKonfirmasiPesanan(
-          orderId: '#ZF-1202', // Dummy, sesuai Figma
-          estimasiDijemput: '14:00 WIB', // Dummy, sesuai Figma
-        ),
+  // Dialog / Modal Konfirmasi Pesanan Selesai (Front-End Only)
+  void tampilkanModalKonfirmasiPesanan() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
       ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 26),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 44,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE0E0E0),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                width: 60,
+                height: 60,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFEFF6FF),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check_circle_rounded,
+                  color: Color(0xFF0040A1),
+                  size: 34,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Pesanan Siap Dibuat!',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF191C1D),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Driver LaundryIn akan menjemput cucian ke Kosan Harapan Indah sesuai jadwal.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13,
+                  color: const Color(0xFF737785),
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Tutup modal
+                  Navigator.pop(context); // Kembali ke Beranda
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0040A1),
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(9999),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  'Kembali ke Beranda',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        );
+      },
     );
   }
 }
