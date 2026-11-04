@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'alamat_screen.dart';
 
 // ====================================================================
 // HALAMAN PESAN LAUNDRY (Pesan Laundry Remake - Figma #293:1587)
@@ -29,7 +30,22 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
 
   // Animasi skala tombol aksi di bawah saat ditekan (interaksi sentuh)
   double skalaTombolAksi = 1.0;
+    String namaAlamat = 'Kos';
+  String detailAlamat =
+      'Kosan Harapan Indah, Kecamatan Sukapura,\nKabupaten Bandung, Jawa Barat 11530';
 
+  Future<void> bukaAturAlamat() async {
+    final AddressModel? alamatDipilih = await Navigator.push<AddressModel>(
+      context,
+      MaterialPageRoute(builder: (context) => const AddressListScreen()),
+    );
+    if (alamatDipilih != null && mounted) {
+      setState(() {
+        namaAlamat = alamatDipilih.label;
+        detailAlamat = alamatDipilih.fullAddress;
+      });
+    }
+  }
   // Perhitungan estimasi biaya dummy berdasarkan pilihan layanan & kecepatan
   String get estimasiBiaya {
     if (kecepatanDipilih == 0) {
@@ -585,7 +601,7 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Kos',
+                    namaAlamat,
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -598,7 +614,7 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
 
               // Detail Alamat Lengkap
               Text(
-                'Kosan Harapan Indah, Kecamatan Sukapura,\nKabupaten Bandung, Jawa Barat 11530',
+                detailAlamat,
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 12,
                   fontWeight: FontWeight.w400,
@@ -610,9 +626,7 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
 
               // Tombol Tautan Atur Alamat
               GestureDetector(
-                onTap: () {
-                  // Interaksi ubah alamat
-                },
+                                onTap: bukaAturAlamat,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

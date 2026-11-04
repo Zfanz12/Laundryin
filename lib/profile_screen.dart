@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'alamat_screen.dart';
 
 // Halaman profil pengguna
 class HalamanProfil extends StatefulWidget {
@@ -193,6 +194,7 @@ class _HalamanProfilState extends State<HalamanProfil> {
       children: [
         // Menu 1: Alamat Tersimpan
         itemMenu(
+          
           indeks: 0,
           judul: 'Alamat Tersimpan',
           subjudul:
@@ -200,8 +202,18 @@ class _HalamanProfilState extends State<HalamanProfil> {
           ikon: Icons.location_on_rounded,
           warnaIkon: const Color(0xFF0040A1),
           warnaLatarIkon: const Color(0xFFE8F1FD),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AddressListScreen(),
+              ),
+            );
+          },
         ),
         const SizedBox(height: 14),
+
+        
 
         // Menu 2: Edit Profil
         itemMenu(
@@ -244,6 +256,7 @@ class _HalamanProfilState extends State<HalamanProfil> {
         ),
       ],
     );
+    
   }
 
   // Desain kartu untuk setiap baris menu dengan animasi sentuh (tanpa snackbar)
@@ -254,10 +267,12 @@ class _HalamanProfilState extends State<HalamanProfil> {
     required IconData ikon,
     required Color warnaIkon,
     required Color warnaLatarIkon,
+    VoidCallback? onTap,
   }) {
     final bool sedangDitekan = (indeksMenuDitekan == indeks);
 
     return GestureDetector(
+      onTap: onTap,
       onTapDown: (_) {
         setState(() {
           indeksMenuDitekan = indeks;
