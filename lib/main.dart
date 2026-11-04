@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'home_screen.dart';
+import 'pesanan_screen.dart';
 import 'profile_screen.dart';
 
 void main() {
@@ -41,17 +42,8 @@ class _NavigasiUtamaState extends State<NavigasiUtama> {
           });
         },
       ),
-      // Halaman Pesanan (Placeholder Front End)
-      const Scaffold(
-        backgroundColor: Color(0xFFF8F9FA),
-        body: Center(
-          child: Text(
-            'Halaman Pesanan\n(Segera Hadir)',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, color: Colors.grey),
-          ),
-        ),
-      ),
+      // Halaman Pesanan
+      const HalamanPesanan(),
       // Halaman Notifikasi (Placeholder Front End)
       const Scaffold(
         backgroundColor: Color(0xFFF8F9FA),
