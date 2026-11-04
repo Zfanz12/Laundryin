@@ -33,6 +33,7 @@ class _NavigasiUtamaState extends State<NavigasiUtama> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> daftarHalaman = [
+      // Halaman Home
       HalamanUtama(
         onKeProfil: () {
           setState(() {
@@ -40,26 +41,29 @@ class _NavigasiUtamaState extends State<NavigasiUtama> {
           });
         },
       ),
+      // Halaman Pesanan (Placeholder Front End)
       const Scaffold(
         backgroundColor: Color(0xFFF8F9FA),
         body: Center(
           child: Text(
-            'Pesanan\n(Nanti bingung)',
+            'Halaman Pesanan\n(Segera Hadir)',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, color: Colors.grey),
           ),
         ),
       ),
+      // Halaman Notifikasi (Placeholder Front End)
       const Scaffold(
         backgroundColor: Color(0xFFF8F9FA),
         body: Center(
           child: Text(
-            'Notifikasi\n(yh nnti)',
+            'Halaman Notifikasi\n(Segera Hadir)',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, color: Colors.grey),
           ),
         ),
       ),
+      // Halaman Profil
       const HalamanProfil(),
     ];
 
@@ -68,54 +72,62 @@ class _NavigasiUtamaState extends State<NavigasiUtama> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(32),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 20,
-              offset: const Offset(0, -4),
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 32,
+              offset: const Offset(0, -8),
             ),
           ],
         ),
-        child: BottomNavigationBar(
-          currentIndex: indexSaatIni,
-          onTap: (indexBaru) {
-            setState(() {
-              indexSaatIni = indexBaru;
-            });
-          },
-          selectedItemColor: const Color(0xFF0040A1),
-          unselectedItemColor: const Color(0xFFA3A3A3),
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          elevation: 0,
-          selectedLabelStyle: GoogleFonts.plusJakartaSans(
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.5,
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(32),
           ),
-          unselectedLabelStyle: GoogleFonts.plusJakartaSans(
-            fontSize: 10,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0.5,
+          child: BottomNavigationBar(
+            currentIndex: indexSaatIni,
+            onTap: (indexBaru) {
+              setState(() {
+                indexSaatIni = indexBaru;
+              });
+            },
+            selectedItemColor: const Color(0xFF0040A1),
+            unselectedItemColor: const Color(0xFFA3A3A3),
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.white,
+            elevation: 0,
+            selectedLabelStyle: GoogleFonts.plusJakartaSans(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.0,
+            ),
+            unselectedLabelStyle: GoogleFonts.plusJakartaSans(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 1.0,
+            ),
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_rounded),
+                label: 'HOME',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.receipt_long_rounded),
+                label: 'PESANAN',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.notifications_none_rounded),
+                label: 'NOTIFIKASI',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person_rounded),
+                label: 'PROFIL',
+              ),
+            ],
           ),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_rounded),
-              label: 'HOME',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long_rounded),
-              label: 'PESANAN',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.notifications_none_rounded),
-              label: 'NOTIFIKASI',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_rounded),
-              label: 'PROFIL',
-            ),
-          ],
         ),
       ),
     );
