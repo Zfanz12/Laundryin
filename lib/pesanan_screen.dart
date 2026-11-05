@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'pembayaran_screen.dart';
 
 // ====================================================================
 // HALAMAN PESANAN (Tab "PESANAN" di navigasi bawah)
@@ -194,7 +195,7 @@ class HalamanPesanan extends StatelessWidget {
               ...pesananAktif.map(
                 (pesanan) => Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: kartuPesanan(pesanan),
+                  child: kartuPesanan(context, pesanan),
                 ),
               ),
               const SizedBox(height: 12),
@@ -205,7 +206,7 @@ class HalamanPesanan extends StatelessWidget {
               ...riwayatPesanan.map(
                 (pesanan) => Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: kartuPesanan(pesanan),
+                  child: kartuPesanan(context, pesanan),
                 ),
               ),
             ],
@@ -371,7 +372,7 @@ class HalamanPesanan extends StatelessWidget {
   // ==========================================================
   // WIDGET: KARTU PESANAN (dipakai untuk Aktif & Riwayat)
   // ==========================================================
-  Widget kartuPesanan(Map<String, dynamic> pesanan) {
+  Widget kartuPesanan(BuildContext context, Map<String, dynamic> pesanan) {
     final bool hijau = pesanan['hijau'] as bool;
     final Color warnaTitik =
         hijau ? const Color(0xFF03AF23) : const Color(0xFFFF9800);
@@ -589,7 +590,24 @@ class HalamanPesanan extends StatelessWidget {
                       return Expanded(
                         child: TextButton(
                           onPressed: () {
-                            // Aksi belum ada (menunggu halaman terkait)
+                            // tombol Bayar -> halaman pembayaran
+                            if (teks == 'Bayar') {
+                              // "Rp215.000" -> 215000
+                              final total = int.parse(
+                                (harga ?? '0').replaceAll(RegExp(r'[^0-9]'), ''),
+                              );
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MetodePembayaranScreen(
+                                    orderId: pesanan['id'] as String,
+                                    total: total,
+                                  ),
+                                ),
+                              );
+                            }
+                            // Detail & Track belum ada (menunggu halaman terkait)
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: warnaBiru,
