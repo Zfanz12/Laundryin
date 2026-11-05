@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'detail_pesanan_screen.dart';
 
-// ====================================================================
-// HALAMAN PESANAN (Tab "PESANAN" di navigasi bawah)
-// Isi: Ringkasan (Total Pesanan & Hemat Waktu), Pesanan Aktif, Riwayat
-// Full Front-End Only (data dummy), Kode Sederhana & Ramah Pemula
-// ====================================================================
 class HalamanPesanan extends StatelessWidget {
   const HalamanPesanan({super.key});
 
@@ -13,13 +9,6 @@ class HalamanPesanan extends StatelessWidget {
   static const Color warnaTeksGelap = Color(0xFF191C1D);
   static const Color warnaTeksAbu = Color(0xFF737785);
 
-  // ------------------------------------------------------------------
-  // DATA DUMMY: Pesanan Aktif
-  // 'hijau' true  -> titik hijau (DIANTAR / SELESAI)
-  // 'hijau' false -> titik oranye (proses lainnya)
-  // 'progres' null -> progress bar & estimasi disembunyikan (riwayat)
-  // 'aksi' -> tombol di bagian bawah kartu
-  // ------------------------------------------------------------------
   static const List<Map<String, dynamic>> pesananAktif = [
     {
       'id': '#ZF-1200',
@@ -78,7 +67,7 @@ class HalamanPesanan extends StatelessWidget {
       'aksi': ['Bayar'],
     },
     {
-      'id': '#ZF-2709',
+      'id': '#ZF-2710',
       'layanan': 'Regular • Gosok Saja',
       'tanggal': '24 Oktober 2026',
       'status': 'DIHITUNG',
@@ -107,9 +96,6 @@ class HalamanPesanan extends StatelessWidget {
     },
   ];
 
-  // ------------------------------------------------------------------
-  // DATA DUMMY: Riwayat Pesanan (semua SELESAI, tanpa progress bar)
-  // ------------------------------------------------------------------
   static const List<Map<String, dynamic>> riwayatPesanan = [
     {
       'id': '#ZF-0101',
@@ -161,6 +147,15 @@ class HalamanPesanan extends StatelessWidget {
     },
   ];
 
+  void bukaDetailPesanan(BuildContext context, Map<String, dynamic> pesanan) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HalamanDetailPesanan(pesanan: pesanan),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -172,7 +167,6 @@ class HalamanPesanan extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Judul Halaman
               Text(
                 'Pesanan',
                 style: GoogleFonts.plusJakartaSans(
@@ -183,29 +177,23 @@ class HalamanPesanan extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 18),
-
-              // 2. Ringkasan (Total Pesanan & Hemat Waktu)
               bagianRingkasan(),
               const SizedBox(height: 28),
-
-              // 3. Pesanan Aktif
               judulBagian('Pesanan Aktif'),
               const SizedBox(height: 14),
               ...pesananAktif.map(
                 (pesanan) => Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: kartuPesanan(pesanan),
+                  child: kartuPesanan(context, pesanan),
                 ),
               ),
               const SizedBox(height: 12),
-
-              // 4. Riwayat Pesanan
               judulBagian('Riwayat pesanan'),
               const SizedBox(height: 14),
               ...riwayatPesanan.map(
                 (pesanan) => Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: kartuPesanan(pesanan),
+                  child: kartuPesanan(context, pesanan),
                 ),
               ),
             ],
@@ -215,9 +203,6 @@ class HalamanPesanan extends StatelessWidget {
     );
   }
 
-  // ==========================================================
-  // WIDGET: JUDUL BAGIAN + IKON FILTER
-  // ==========================================================
   Widget judulBagian(String judul) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -231,22 +216,14 @@ class HalamanPesanan extends StatelessWidget {
             letterSpacing: -0.3,
           ),
         ),
-        const Icon(
-          Icons.filter_list_rounded,
-          color: warnaBiru,
-          size: 22,
-        ),
+        const Icon(Icons.filter_list_rounded, color: warnaBiru, size: 22),
       ],
     );
   }
 
-  // ==========================================================
-  // WIDGET: RINGKASAN (2 KARTU: TOTAL PESANAN & HEMAT WAKTU)
-  // ==========================================================
   Widget bagianRingkasan() {
     return Row(
       children: [
-        // Kartu Putih: Total Pesanan
         Expanded(
           child: Container(
             height: 96,
@@ -256,55 +233,40 @@ class HalamanPesanan extends StatelessWidget {
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 16,
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 18,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
-            child: Stack(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Positioned(
-                  right: -4,
-                  top: -4,
-                  child: Icon(
-                    Icons.receipt_long_rounded,
-                    size: 52,
-                    color: warnaTeksAbu.withValues(alpha: 0.15),
+                Text(
+                  'TOTAL PESANAN',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: warnaTeksAbu,
+                    letterSpacing: 1.2,
                   ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'TOTAL PESANAN',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: warnaTeksAbu,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '24',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w800,
-                        color: warnaBiru,
-                        height: 1.1,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 4),
+                Text(
+                  '6',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w800,
+                    color: warnaBiru,
+                    height: 1.1,
+                  ),
                 ),
               ],
             ),
           ),
         ),
         const SizedBox(width: 14),
-
-        // Kartu Biru: Hemat Waktu
         Expanded(
           child: Container(
             height: 96,
@@ -368,164 +330,185 @@ class HalamanPesanan extends StatelessWidget {
     );
   }
 
-  // ==========================================================
-  // WIDGET: KARTU PESANAN (dipakai untuk Aktif & Riwayat)
-  // ==========================================================
-  Widget kartuPesanan(Map<String, dynamic> pesanan) {
+  Widget kartuPesanan(BuildContext context, Map<String, dynamic> pesanan) {
     final bool hijau = pesanan['hijau'] as bool;
-    final Color warnaTitik =
-        hijau ? const Color(0xFF03AF23) : const Color(0xFFFF9800);
-    final Color warnaLatarBadge =
-        hijau ? const Color(0xFFF0FFF3) : const Color(0xFFFFF5E6);
-    final Color warnaGlow =
-        hijau ? const Color(0xFF5CDF63) : const Color(0xFFFF9800);
+    final Color warnaTitik = hijau
+        ? const Color(0xFF03AF23)
+        : const Color(0xFFFF9800);
+    final Color warnaLatarBadge = hijau
+        ? const Color(0xFFF0FFF3)
+        : const Color(0xFFFFF5E6);
+    final Color warnaGlow = hijau
+        ? const Color(0xFF5CDF63)
+        : const Color(0xFFFF9800);
 
     final double? progres = pesanan['progres'] as double?;
     final String? harga = pesanan['harga'] as String?;
     final List<String> daftarAksi = (pesanan['aksi'] as List).cast<String>();
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 18,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: Stack(
-          children: [
-            // Glow warna status di pojok kanan atas
-            Positioned(
-              top: -50,
-              right: -50,
-              child: Container(
-                width: 190,
-                height: 190,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      warnaGlow.withValues(alpha: 0.22),
-                      warnaGlow.withValues(alpha: 0.0),
-                    ],
+    return GestureDetector(
+      onTap: () => bukaDetailPesanan(context, pesanan),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 18,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: Stack(
+            children: [
+              Positioned(
+                top: -50,
+                right: -50,
+                child: Container(
+                  width: 190,
+                  height: 190,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        warnaGlow.withValues(alpha: 0.22),
+                        warnaGlow.withValues(alpha: 0.0),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-
-            // Isi Kartu
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Baris atas: Ikon, Info Pesanan, Badge Status
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEFF4FB),
-                          borderRadius: BorderRadius.circular(16),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEFF4FB),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(
+                            Icons.local_laundry_service_rounded,
+                            color: warnaBiru,
+                            size: 24,
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.local_laundry_service_rounded,
-                          color: warnaBiru,
-                          size: 24,
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                pesanan['layanan'] as String,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: warnaTeksAbu,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                pesanan['id'] as String,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                  color: warnaTeksGelap,
+                                  letterSpacing: -0.4,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                pesanan['tanggal'] as String,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w400,
+                                  color: warnaTeksAbu,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: warnaLatarBadge,
+                            borderRadius: BorderRadius.circular(9999),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 7,
+                                height: 7,
+                                decoration: BoxDecoration(
+                                  color: warnaTitik,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                pesanan['status'] as String,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  color: warnaTeksGelap,
+                                  letterSpacing: 0.6,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Detail Item',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: warnaTeksAbu,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              barisDetail(
+                                Icons.checkroom_rounded,
+                                pesanan['item'] as String,
+                              ),
+                              const SizedBox(height: 6),
+                              barisDetail(
+                                Icons.scale_outlined,
+                                pesanan['berat'] as String,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              pesanan['layanan'] as String,
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                color: warnaTeksAbu,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              pesanan['id'] as String,
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                                color: warnaTeksGelap,
-                                letterSpacing: -0.4,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              pesanan['tanggal'] as String,
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w400,
-                                color: warnaTeksAbu,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Badge Status (titik + teks)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: warnaLatarBadge,
-                          borderRadius: BorderRadius.circular(9999),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 7,
-                              height: 7,
-                              decoration: BoxDecoration(
-                                color: warnaTitik,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              pesanan['status'] as String,
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w800,
-                                color: warnaTeksGelap,
-                                letterSpacing: 0.6,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-
-                  // Baris tengah: Detail Item (kiri) & Total Harga (kanan)
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Detail Item',
+                              'Total Harga',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
@@ -533,90 +516,60 @@ class HalamanPesanan extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            barisDetail(
-                              Icons.checkroom_rounded,
-                              pesanan['item'] as String,
-                            ),
-                            const SizedBox(height: 6),
-                            barisDetail(
-                              Icons.scale_outlined,
-                              pesanan['berat'] as String,
+                            Text(
+                              harga ?? '~',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: warnaBiru,
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            'Total Harga',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: warnaTeksAbu,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            harga ?? '~',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: warnaBiru,
-                            ),
-                          ),
-                        ],
+                      ],
+                    ),
+                    if (progres != null) ...[
+                      const SizedBox(height: 16),
+                      progressBar(progres),
+                      const SizedBox(height: 14),
+                      barisEstimasi(
+                        pesanan['estimasiLabel'] as String,
+                        pesanan['estimasi'] as String,
                       ),
                     ],
-                  ),
-
-                  // Progress bar & estimasi (hanya untuk pesanan aktif)
-                  if (progres != null) ...[
-                    const SizedBox(height: 16),
-                    progressBar(progres),
-                    const SizedBox(height: 14),
-                    barisEstimasi(
-                      pesanan['estimasiLabel'] as String,
-                      pesanan['estimasi'] as String,
-                    ),
-                  ],
-                  const SizedBox(height: 8),
-
-                  // Tombol aksi (Detail / Track / Bayar)
-                  Row(
-                    children: daftarAksi.map((teks) {
-                      return Expanded(
-                        child: TextButton(
-                          onPressed: () {
-                            // Aksi belum ada (menunggu halaman terkait)
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor: warnaBiru,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          child: Text(
-                            teks,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: warnaBiru,
+                    const SizedBox(height: 8),
+                    Row(
+                      children: daftarAksi.map((teks) {
+                        return Expanded(
+                          child: TextButton(
+                            onPressed: () =>
+                                bukaDetailPesanan(context, pesanan),
+                            style: TextButton.styleFrom(
+                              foregroundColor: warnaBiru,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            child: Text(
+                              teks,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: warnaBiru,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ],
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // Satu baris detail: ikon + teks (abu-abu kalau masih "sedang dihitung")
   Widget barisDetail(IconData ikon, String teks) {
     final bool redup = teks.startsWith('sedang');
     return Row(
@@ -637,7 +590,6 @@ class HalamanPesanan extends StatelessWidget {
     );
   }
 
-  // Progress bar biru (0.0 - 1.0)
   Widget progressBar(double nilai) {
     return Container(
       height: 6,
@@ -659,15 +611,10 @@ class HalamanPesanan extends StatelessWidget {
     );
   }
 
-  // Baris estimasi: ikon jam + "Estimasi Sampai: 7 Menit"
   Widget barisEstimasi(String label, String nilai) {
     return Row(
       children: [
-        const Icon(
-          Icons.schedule_rounded,
-          size: 15,
-          color: Color(0xFF8B5000),
-        ),
+        const Icon(Icons.schedule_rounded, size: 15, color: Color(0xFF8B5000)),
         const SizedBox(width: 6),
         Text.rich(
           TextSpan(
