@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'pembayaran_screen.dart';
+import 'detail_pesanan_screen.dart';
 
 // ====================================================================
 // HALAMAN PESANAN (Tab "PESANAN" di navigasi bawah)
@@ -607,7 +608,17 @@ class HalamanPesanan extends StatelessWidget {
                                 ),
                               );
                             }
-                            // Detail & Track belum ada (menunggu halaman terkait)
+                            // tombol Detail -> halaman detail pesanan
+                            else if (teks == 'Detail') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      HalamanDetailPesanan(pesanan: pesanan),
+                                ),
+                              );
+                            }
+                            // Track belum ada (menunggu halaman terkait)
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: warnaBiru,
