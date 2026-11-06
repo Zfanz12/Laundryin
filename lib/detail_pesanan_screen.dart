@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'pembayaran_screen.dart';
 
 class HalamanDetailPesanan extends StatelessWidget {
   final Map<String, dynamic> pesanan;
@@ -202,7 +203,7 @@ class HalamanDetailPesanan extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 if (menungguBayar) ...[
-                  kartuPembayaran(),
+                  kartuPembayaran(context),
                   const SizedBox(height: 20),
                 ],
 
@@ -213,7 +214,7 @@ class HalamanDetailPesanan extends StatelessWidget {
 
                 if (!menungguBayar) ...[
                   const SizedBox(height: 20),
-                  kartuPembayaran(),
+                  kartuPembayaran(context),
                 ],
                 const SizedBox(height: 20),
 
@@ -786,7 +787,7 @@ class HalamanDetailPesanan extends StatelessWidget {
     );
   }
 
-  Widget kartuPembayaran() {
+  Widget kartuPembayaran(BuildContext context) {
     final int? total = totalHarga;
     final String teksSubtotal = total == null
         ? 'Rp ~'
@@ -842,7 +843,7 @@ class HalamanDetailPesanan extends StatelessWidget {
 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [metodePembayaran(), tombolPembayaran(total != null)],
+            children: [metodePembayaran(), tombolPembayaran(context, total != null)],
           ),
         ],
       ),
@@ -901,11 +902,21 @@ class HalamanDetailPesanan extends StatelessWidget {
     );
   }
 
-  Widget tombolPembayaran(bool hargaSudahAda) {
+  Widget tombolPembayaran(BuildContext context, bool hargaSudahAda) {
     // Menunggu pembayaran -> tombol BAYAR biru
     if (menungguBayar) {
       return GestureDetector(
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => MetodePembayaranScreen(
+                orderId: pesanan['id'] as String,
+                total: totalHarga ?? 0,
+              ),
+            ),
+          );
+        },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
           decoration: BoxDecoration(
