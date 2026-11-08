@@ -13,8 +13,8 @@ enum StatusPembayaran { menunggu, diterima, gagal }
 class DummyPembayaran {
   // ganti diterima / gagal buat ngetes
   static const StatusPembayaran hasilAkhir = StatusPembayaran.diterima;
-  static const String alasanGagal = 'Nominal Tidak sesuai';
-  static const String namaToko = 'Nama Toko Laundry nya';
+  static const String alasanGagal = 'Nominal tidak sesuai';
+  static const String namaToko = 'LaundryIn';
 }
 
 // format 125000 -> 125.000
@@ -26,7 +26,7 @@ String formatRupiah(int angka) {
 }
 
 // tombol biru
-class TombolUtama extends StatelessWidget {
+class TombolUtama extends StatefulWidget {
   final String teks;
   final VoidCallback onTap;
   final IconData? ikon;
@@ -39,40 +39,57 @@ class TombolUtama extends StatelessWidget {
   });
 
   @override
+  State<TombolUtama> createState() => _TombolUtamaState();
+}
+
+class _TombolUtamaState extends State<TombolUtama> {
+  bool _ditekan = false;
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 52,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(colors: [biru, biruTerang]),
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: biru.withOpacity(0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        alignment: Alignment.center,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              teks,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+      onTapDown: (_) => setState(() => _ditekan = true),
+      onTapUp: (_) {
+        setState(() => _ditekan = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _ditekan = false),
+      child: AnimatedScale(
+        scale: _ditekan ? 0.95 : 1.0,
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOutCubic,
+        child: Container(
+          height: 52,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(colors: [biru, biruTerang]),
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: biru.withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
-            ),
-            if (ikon != null) ...[
-              const SizedBox(width: 6),
-              Icon(ikon, color: Colors.white, size: 16),
             ],
-          ],
+          ),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                widget.teks,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+              if (widget.ikon != null) ...[
+                const SizedBox(width: 6),
+                Icon(widget.ikon, color: Colors.white, size: 16),
+              ],
+            ],
+          ),
         ),
       ),
     );
@@ -280,7 +297,9 @@ class _PembayaranQrisScreenState extends State<PembayaranQrisScreen> {
     // wajib upload bukti (hapus kalau gak perlu)
     if (!sudahUpload) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Upload bukti pembayaran dulu ya')),
+        const SnackBar(
+          content: Text('Silakan unggah bukti pembayaran terlebih dahulu'),
+        ),
       );
       return;
     }
@@ -336,10 +355,10 @@ class _PembayaranQrisScreenState extends State<PembayaranQrisScreen> {
               ),
             ),
           ),
-          // order id
+          // id pesanan
           Center(
             child: Text(
-              'Order ID ${widget.orderId}',
+              'ID Pesanan ${widget.orderId}',
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
             ),
           ),
@@ -355,7 +374,7 @@ class _PembayaranQrisScreenState extends State<PembayaranQrisScreen> {
             child: Column(
               children: [
                 const Text(
-                  'Scan QRIS untuk bayar',
+                  'Pindai QRIS untuk membayar',
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 14),
@@ -406,7 +425,7 @@ class _PembayaranQrisScreenState extends State<PembayaranQrisScreen> {
                   Text(
                     sudahUpload
                         ? 'bukti_pembayaran.jpg'
-                        : 'Upload Bukti Pembayaran',
+                        : 'Unggah Bukti Pembayaran',
                     style: const TextStyle(fontSize: 13),
                   ),
                 ],
@@ -498,23 +517,23 @@ class _StatusPembayaranScreenState extends State<StatusPembayaranScreen> {
       case StatusPembayaran.menunggu:
         warna = const Color(0xFFE6A800);
         ikon = Icons.access_time;
-        judul = 'Tunggu ya!';
+        judul = 'Mohon Menunggu';
         deskripsi =
-            'Admin kami sedang memverifikasi pembayaran anda\nanda bisa cek secara berkala';
+            'Admin kami sedang memverifikasi pembayaran Anda.\nAnda dapat memeriksa secara berkala.';
         break;
       case StatusPembayaran.diterima:
         warna = biru;
         ikon = Icons.check;
         judul = 'Pembayaran Diterima!';
         deskripsi =
-            'Pembayaran anda sudah diverifikasi,\nCucian anda sedang antre';
+            'Pembayaran Anda sudah diverifikasi,\ncucian Anda sedang dalam antrean.';
         break;
       case StatusPembayaran.gagal:
         warna = const Color(0xFFC00000);
         ikon = Icons.close;
         judul = 'Pembayaran Gagal!';
         deskripsi =
-            'Pembayaran anda sudah di Verifikasi,\nnamun admin menyatakan pembayaran anda salah!';
+            'Pembayaran Anda sudah diverifikasi,\nnamun bukti pembayaran belum sesuai.';
         break;
     }
 
@@ -539,7 +558,7 @@ class _StatusPembayaranScreenState extends State<StatusPembayaranScreen> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: warna.withOpacity(0.4),
+                      color: warna.withValues(alpha: 0.4),
                       blurRadius: 40,
                       spreadRadius: 8,
                     ),
@@ -573,7 +592,7 @@ class _StatusPembayaranScreenState extends State<StatusPembayaranScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      gagal ? 'Alasan' : 'Order ID',
+                      gagal ? 'Alasan' : 'ID Pesanan',
                       style: const TextStyle(fontSize: 11, color: Colors.black54),
                     ),
                     Text(

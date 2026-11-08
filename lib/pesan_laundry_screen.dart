@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'alamat_screen.dart';
 
-// ====================================================================
-// HALAMAN PESAN LAUNDRY (Pesan Laundry Remake - Figma #293:1587)
-// Full Front-End Only, Kode Sederhana & Ramah Pemula
-// ====================================================================
 class HalamanPesanLaundry extends StatefulWidget {
   const HalamanPesanLaundry({super.key});
 
@@ -14,23 +10,12 @@ class HalamanPesanLaundry extends StatefulWidget {
 }
 
 class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
-  // Pilihan Jenis Layanan (0: Cuci Gosok, 1: Gosok Saja, 2: Cuci Saja)
   int jenisLayananDipilih = 0;
-
-  // Pilihan Kecepatan Layanan (0: Reguler, 1: Express, 2: Instant)
-  // Default di Figma adalah Express (indeks 1)
   int kecepatanDipilih = 1;
-
-  // Pilihan Kategori Item (Bisa multi-select)
-  // Default di Figma adalah 'Pakaian' aktif
   final Set<String> kategoriTerpilih = {'Pakaian'};
-
-  // Controller untuk kolom input catatan tambahan
   final TextEditingController catatanController = TextEditingController();
-
-  // Animasi skala tombol aksi di bawah saat ditekan (interaksi sentuh)
   double skalaTombolAksi = 1.0;
-    String namaAlamat = 'Kos';
+  String namaAlamat = 'Kos';
   String detailAlamat =
       'Kosan Harapan Indah, Kecamatan Sukapura,\nKabupaten Bandung, Jawa Barat 11530';
 
@@ -46,16 +31,18 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
       });
     }
   }
-  // Perhitungan estimasi biaya dummy berdasarkan pilihan layanan & kecepatan
-  String get estimasiBiaya {
+
+  String get minHarga {
     if (kecepatanDipilih == 0) {
-      return 'Rp 45.000 - Rp 65.000';
+      return 'Rp 45.000';
     } else if (kecepatanDipilih == 1) {
-      return 'Rp 65.000 - Rp 95.000'; // Sesuai tampilan Figma (#310:2086)
+      return 'Rp 65.000';
     } else {
-      return 'Rp 95.000 - Rp 130.000';
+      return 'Rp 95.000';
     }
   }
+
+  String get estimasiBiaya => 'Biaya mulai dari $minHarga';
 
   @override
   void dispose() {
@@ -67,9 +54,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
-
-      // Header Atas 1:1 Sesuai Figma (#293:1708)
-      // Tanpa lingkaran biru aneh, tombol panah langsung menyatu dengan judul
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
         child: Container(
@@ -118,51 +102,34 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
           ),
         ),
       ),
-
-      // Badan Halaman yang Dapat Di-scroll
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(24, 20, 24, 150),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. Bagian Jenis Layanan (Cuci Gosok, Gosok Saja, Cuci Saja)
             bagianJenisLayanan(),
             const SizedBox(height: 32),
-
-            // 2. Bagian Kecepatan Layanan (Reguler, Express, Instant)
             bagianKecepatanLayanan(),
             const SizedBox(height: 32),
-
-            // 3. Bagian Kategori Item (Pakaian, Sepatu, Sprei, Lainnya)
             bagianKategoriItem(),
             const SizedBox(height: 32),
-
-            // 4. Bagian Alamat & Jadwal Penjemputan (Bento Cards)
             bagianAlamatDanJadwal(),
             const SizedBox(height: 32),
-
-            // 5. Bagian Catatan Tambahan (Opsional)
             bagianCatatanTambahan(),
           ],
         ),
       ),
-
-      // Bottom Bar Aksi Biaya & Tombol Pesan Sekarang (#310:2086)
       bottomSheet: bagianBawahAksi(),
     );
   }
 
-  // ==========================================================
-  // 1. WIDGET: PILIHAN JENIS LAYANAN (#293:1590)
-  // ==========================================================
   Widget bagianJenisLayanan() {
     final daftarJenis = ['Cuci Gosok', 'Gosok Saja', 'Cuci Saja'];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Judul Bagian + Label Wajib Diisi
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -186,8 +153,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
           ],
         ),
         const SizedBox(height: 14),
-
-        // Segmented Control 3 Tombol (Persis Figma #302:1815)
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(6),
@@ -227,8 +192,9 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                         daftarJenis[indeks],
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
-                          fontWeight:
-                              isDipilih ? FontWeight.w700 : FontWeight.w600,
+                          fontWeight: isDipilih
+                              ? FontWeight.w700
+                              : FontWeight.w600,
                           color: isDipilih
                               ? const Color(0xFF0040A1)
                               : const Color(0xFF424654),
@@ -245,10 +211,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
     );
   }
 
-  // ==========================================================
-  // 2. WIDGET: PILIHAN KECEPATAN LAYANAN (#293:1601)
-  // Sesuai Prototype Figma: Kartu terpilih berubah warna penuh & glow
-  // ==========================================================
   Widget bagianKecepatanLayanan() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,52 +225,36 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
           ),
         ),
         const SizedBox(height: 14),
-
-        // Kartu 1: Reguler (Biru Penuh saat aktif)
         kartuKecepatan(
           indeks: 0,
           nama: 'Reguler',
           deskripsi: '48 jam pengerjaan',
           ikon: Icons.access_time_rounded,
-          warnaGradient: const [
-            Color(0xFF0E63DE),
-            Color(0xFF1469E3),
-          ],
+          warnaGradient: const [Color(0xFF0E63DE), Color(0xFF1469E3)],
           warnaGlow: const Color(0xFF0F64DF),
         ),
         const SizedBox(height: 14),
-
-        // Kartu 2: Express (Kuning Emas Penuh saat aktif - Default Figma)
         kartuKecepatan(
           indeks: 1,
-          nama: 'Express',
+          nama: 'Ekspres',
           deskripsi: '24 jam pengerjaan',
           ikon: Icons.flash_on_rounded,
-          warnaGradient: const [
-            Color(0xFFF3BB01),
-            Color(0xFFF6C601),
-          ],
+          warnaGradient: const [Color(0xFFF3BB01), Color(0xFFF6C601)],
           warnaGlow: const Color(0xFFF3BB01),
         ),
         const SizedBox(height: 14),
-
-        // Kartu 3: Instant (Hijau Penuh saat aktif)
         kartuKecepatan(
           indeks: 2,
-          nama: 'Instant',
+          nama: 'Instan',
           deskripsi: '6 jam pengerjaan',
           ikon: Icons.rocket_launch_rounded,
-          warnaGradient: const [
-            Color(0xFF2BBC3B),
-            Color(0xFF33C243),
-          ],
+          warnaGradient: const [Color(0xFF2BBC3B), Color(0xFF33C243)],
           warnaGlow: const Color(0xFF2BBC3B),
         ),
       ],
     );
   }
 
-  // Komponen Kartu Kecepatan Interaktif 1:1 Sesuai Prototype Figma
   Widget kartuKecepatan({
     required int indeks,
     required String nama,
@@ -360,7 +306,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
           child: Row(
             children: [
-              // Kotak Ikon (Transparan putih saat aktif, abu muda saat tidak aktif)
               Container(
                 width: 40,
                 height: 40,
@@ -377,8 +322,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                 ),
               ),
               const SizedBox(width: 14),
-
-              // Teks Nama dan Estimasi Waktu Pengerjaan
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,8 +331,9 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color:
-                            isDipilih ? Colors.white : const Color(0xFF191C1D),
+                        color: isDipilih
+                            ? Colors.white
+                            : const Color(0xFF191C1D),
                       ),
                     ),
                     const SizedBox(height: 3),
@@ -406,17 +350,15 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                   ],
                 ),
               ),
-
-              // Indikator Radio Donut (Putih tebal saat aktif, abu-abu saat tidak aktif)
               Container(
                 width: 26,
                 height: 26,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.transparent,
+                  color: isDipilih ? Colors.white : Colors.transparent,
                   border: Border.all(
                     color: isDipilih ? Colors.white : const Color(0xFFE7E8E9),
-                    width: isDipilih ? 3.5 : 2.5,
+                    width: 2.5,
                   ),
                 ),
               ),
@@ -427,14 +369,11 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
     );
   }
 
-  // ==========================================================
-  // 3. WIDGET: PILIHAN KATEGORI ITEM (#293:1636)
-  // ==========================================================
   Widget bagianKategoriItem() {
     final daftarKategori = [
       {'nama': 'Pakaian', 'ikon': Icons.checkroom_rounded},
       {'nama': 'Sepatu', 'ikon': Icons.roller_skating_rounded},
-      {'nama': 'Sprei', 'ikon': Icons.bed_rounded},
+      {'nama': 'Seprai', 'ikon': Icons.bed_rounded},
       {'nama': 'Lainnya', 'ikon': Icons.more_horiz_rounded},
     ];
 
@@ -451,8 +390,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
           ),
         ),
         const SizedBox(height: 14),
-
-        // Baris Item yang Bisa Di-scroll Horizontal
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
@@ -466,7 +403,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                 onTap: () {
                   setState(() {
                     if (isDipilih) {
-                      // Minimal satu kategori harus tetap terpilih
                       if (kategoriTerpilih.length > 1) {
                         kategoriTerpilih.remove(nama);
                       }
@@ -484,10 +420,7 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
                     border: isDipilih
-                        ? Border.all(
-                            color: const Color(0xFF0040A1),
-                            width: 1.8,
-                          )
+                        ? Border.all(color: const Color(0xFF0040A1), width: 1.8)
                         : null,
                     boxShadow: [
                       BoxShadow(
@@ -502,7 +435,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Kotak Ikon (48x48, borderRadius 16)
                       Container(
                         width: 48,
                         height: 48,
@@ -525,8 +457,9 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                         nama,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 12,
-                          fontWeight:
-                              isDipilih ? FontWeight.w700 : FontWeight.w600,
+                          fontWeight: isDipilih
+                              ? FontWeight.w700
+                              : FontWeight.w600,
                           color: isDipilih
                               ? const Color(0xFF0040A1)
                               : const Color(0xFF424654),
@@ -543,14 +476,10 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
     );
   }
 
-  // ==========================================================
-  // 4. WIDGET: ALAMAT & JADWAL PENJEMPUTAN (BENTO CARDS) (#293:1664)
-  // ==========================================================
   Widget bagianAlamatDanJadwal() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Judul Bagian
         Text(
           'Alamat',
           style: GoogleFonts.plusJakartaSans(
@@ -561,8 +490,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
           ),
         ),
         const SizedBox(height: 14),
-
-        // Kartu 1: Alamat Penjemputan (#293:1665)
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(24),
@@ -590,8 +517,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                 ),
               ),
               const SizedBox(height: 10),
-
-              // Baris Nama Tempat Kos
               Row(
                 children: [
                   const Icon(
@@ -611,8 +536,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                 ],
               ),
               const SizedBox(height: 6),
-
-              // Detail Alamat Lengkap
               Text(
                 detailAlamat,
                 style: GoogleFonts.plusJakartaSans(
@@ -623,10 +546,8 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Tombol Tautan Atur Alamat
               GestureDetector(
-                                onTap: bukaAturAlamat,
+                onTap: bukaAturAlamat,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -652,8 +573,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
           ),
         ),
         const SizedBox(height: 14),
-
-        // Kartu 2: Jadwal Penjemputan (#293:1680)
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(24),
@@ -681,8 +600,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                 ),
               ),
               const SizedBox(height: 10),
-
-              // Tanggal & Ikon Kalender
               Row(
                 children: [
                   const Icon(
@@ -702,8 +619,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                 ],
               ),
               const SizedBox(height: 4),
-
-              // Jam Penjemputan
               Padding(
                 padding: const EdgeInsets.only(left: 24),
                 child: Text(
@@ -716,12 +631,8 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Tombol Tautan Atur Ulang Jadwal
               GestureDetector(
-                onTap: () {
-                  // Interaksi ubah jadwal
-                },
+                onTap: () {},
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -750,9 +661,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
     );
   }
 
-  // ==========================================================
-  // 5. WIDGET: CATATAN TAMBAHAN (OPSIONAL) (#293:1699)
-  // ==========================================================
   Widget bagianCatatanTambahan() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -767,8 +675,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
           ),
         ),
         const SizedBox(height: 14),
-
-        // Text Area Input Box Persis Figma (#740:1860)
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
@@ -783,7 +689,7 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
               color: const Color(0xFF191C1D),
             ),
             decoration: InputDecoration(
-              hintText: 'Contoh: Tolong jangan pake pemutih',
+              hintText: 'Contoh: Tolong jangan pakai pemutih',
               hintStyle: GoogleFonts.plusJakartaSans(
                 fontSize: 12,
                 color: const Color(0xFF737785),
@@ -805,18 +711,13 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
     );
   }
 
-  // ==========================================================
-  // 6. WIDGET: BOTTOM BAR AKSI (ESTIMASI BIAYA + PESAN SEKARANG)
-  // ==========================================================
   Widget bagianBawahAksi() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.96),
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(32),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -828,21 +729,20 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Baris Estimasi Biaya
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Estimasi Biaya',
+                'Biaya mulai dari :',
                 style: GoogleFonts.plusJakartaSans(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
                   color: const Color(0xFF424654),
                 ),
               ),
               Text(
-                estimasiBiaya,
+                minHarga,
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -853,19 +753,16 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
             ],
           ),
           const SizedBox(height: 16),
-
-          // Tombol Pesan Sekarang (#I310:2086;293:1731)
           GestureDetector(
             onTapDown: (_) {
               setState(() {
-                skalaTombolAksi = 0.96;
+                skalaTombolAksi = 0.94;
               });
             },
             onTapUp: (_) {
               setState(() {
                 skalaTombolAksi = 1.0;
               });
-              // Tampilkan dialog feedback pesanan berhasil dibuat (front-end dummy)
               tampilkanModalKonfirmasiPesanan();
             },
             onTapCancel: () {
@@ -875,17 +772,14 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
             },
             child: AnimatedScale(
               scale: skalaTombolAksi,
-              duration: const Duration(milliseconds: 120),
-              curve: Curves.easeInOut,
+              duration: const Duration(milliseconds: 140),
+              curve: Curves.easeOutCubic,
               child: Container(
                 width: double.infinity,
                 height: 54,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFF0040A1),
-                      Color(0xFF0056D2),
-                    ],
+                    colors: [Color(0xFF0040A1), Color(0xFF0056D2)],
                   ),
                   borderRadius: BorderRadius.circular(9999),
                   boxShadow: [
@@ -923,7 +817,6 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
     );
   }
 
-  // Dialog / Modal Konfirmasi Pesanan Selesai (Front-End Only)
   void tampilkanModalKonfirmasiPesanan() {
     showModalBottomSheet(
       context: context,
@@ -970,7 +863,7 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Driver LaundryIn akan menjemput cucian ke Kosan Harapan Indah sesuai jadwal.',
+                'Kurir LaundryIn akan menjemput cucian ke Kosan Harapan Indah sesuai jadwal.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 13,
@@ -980,8 +873,8 @@ class _HalamanPesanLaundryState extends State<HalamanPesanLaundry> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context); // Tutup modal
-                  Navigator.pop(context); // Kembali ke Beranda
+                  Navigator.pop(context);
+                  Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF0040A1),

@@ -33,16 +33,24 @@ const _bold14 = TextStyle(fontWeight: FontWeight.w700, fontSize: 14);
 const _body12 = TextStyle(fontSize: 12, height: 1.4);
 const _grey12 = TextStyle(fontSize: 12, color: AddressColors.textGrey);
 
-Widget _circle(double size, Color color,
-        {Widget? child, Border? border, List<BoxShadow>? shadow}) =>
-    Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-          shape: BoxShape.circle, color: color, border: border, boxShadow: shadow),
-      child: child,
-    );
+Widget _circle(
+  double size,
+  Color color, {
+  Widget? child,
+  Border? border,
+  List<BoxShadow>? shadow,
+}) => Container(
+  width: size,
+  height: size,
+  alignment: Alignment.center,
+  decoration: BoxDecoration(
+    shape: BoxShape.circle,
+    color: color,
+    border: border,
+    boxShadow: shadow,
+  ),
+  child: child,
+);
 
 InputDecoration _searchDecoration(String hint, Color fill, {Widget? suffix}) =>
     InputDecoration(
@@ -66,14 +74,14 @@ class _IconBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: AddressColors.iconBg,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Icon(icon, color: AddressColors.primary, size: size),
-      );
+    width: 40,
+    height: 40,
+    decoration: BoxDecoration(
+      color: AddressColors.iconBg,
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Icon(icon, color: AddressColors.primary, size: size),
+  );
 }
 
 class _AddressRow extends StatelessWidget {
@@ -82,87 +90,123 @@ class _AddressRow extends StatelessWidget {
   final Widget title;
   final String address;
   final String? note;
-  const _AddressRow(
-      {required this.icon,
-      this.iconSize = 20,
-      required this.title,
-      required this.address,
-      this.note});
+  const _AddressRow({
+    required this.icon,
+    this.iconSize = 20,
+    required this.title,
+    required this.address,
+    this.note,
+  });
 
   @override
   Widget build(BuildContext context) => Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _IconBox(icon, size: iconSize),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                title,
-                const SizedBox(height: 4),
-                Text(address, style: _body12),
-                if (note != null && note!.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text('Catatan: $note',
-                      style: const TextStyle(
-                          fontSize: 11, color: AddressColors.textGrey)),
-                ],
-              ],
-            ),
-          ),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _IconBox(icon, size: iconSize),
+      const SizedBox(width: 12),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            title,
+            const SizedBox(height: 4),
+            Text(address, style: _body12),
+            if (note != null && note!.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                'Catatan: $note',
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AddressColors.textGrey,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    ],
+  );
 }
 
-class GradientButton extends StatelessWidget {
+class GradientButton extends StatefulWidget {
   final String text;
   final IconData? icon;
   final VoidCallback? onPressed;
-  const GradientButton(
-      {super.key, required this.text, this.icon, this.onPressed});
+  const GradientButton({
+    super.key,
+    required this.text,
+    this.icon,
+    this.onPressed,
+  });
 
   @override
-  Widget build(BuildContext context) => Material(
+  State<GradientButton> createState() => _GradientButtonState();
+}
+
+class _GradientButtonState extends State<GradientButton> {
+  bool _ditekan = false;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+    onTapDown: widget.onPressed != null ? (_) => setState(() => _ditekan = true) : null,
+    onTapUp: widget.onPressed != null
+        ? (_) {
+            setState(() => _ditekan = false);
+            widget.onPressed?.call();
+          }
+        : null,
+    onTapCancel: widget.onPressed != null ? () => setState(() => _ditekan = false) : null,
+    child: AnimatedScale(
+      scale: _ditekan ? 0.95 : 1.0,
+      duration: const Duration(milliseconds: 140),
+      curve: Curves.easeOutCubic,
+      child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(16),
         clipBehavior: Clip.antiAlias,
         child: Ink(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-                colors: [AddressColors.primaryLight, AddressColors.primary]),
+              colors: [AddressColors.primaryLight, AddressColors.primary],
+            ),
           ),
-          child: InkWell(
-            onTap: onPressed,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (icon != null) ...[
-                    Icon(icon, color: Colors.white, size: 18),
-                    const SizedBox(width: 8),
-                  ],
-                  Text(text,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14)),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (widget.icon != null) ...[
+                  Icon(widget.icon, color: Colors.white, size: 18),
+                  const SizedBox(width: 8),
                 ],
-              ),
+                Text(
+                  widget.text,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-      );
+      ),
+    ),
+  );
 }
 
 class AddressCard extends StatelessWidget {
   final AddressModel data;
   final bool selected;
   final VoidCallback? onTap;
-  const AddressCard(
-      {super.key, required this.data, required this.selected, this.onTap});
+  const AddressCard({
+    super.key,
+    required this.data,
+    required this.selected,
+    this.onTap,
+  });
 
   static const _icons = {
     'home': Icons.home_rounded,
@@ -192,31 +236,41 @@ class AddressCard extends StatelessWidget {
                 icon: _icons[data.iconType] ?? Icons.location_on_rounded,
                 address: data.fullAddress,
                 note: data.note,
-                title: Row(children: [
-                  Text(data.label, style: _bold14),
-                  if (data.isPrimary)
-                    Container(
-                      margin: const EdgeInsets.only(left: 8),
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AddressColors.iconBg,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Text('Utama',
+                title: Row(
+                  children: [
+                    Text(data.label, style: _bold14),
+                    if (data.isPrimary)
+                      Container(
+                        margin: const EdgeInsets.only(left: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AddressColors.iconBg,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'Utama',
                           style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: AddressColors.primary)),
-                    ),
-                ]),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: AddressColors.primary,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
             if (selected)
               const Padding(
                 padding: EdgeInsets.only(left: 8),
-                child: Icon(Icons.check_circle,
-                    color: AddressColors.primary, size: 22),
+                child: Icon(
+                  Icons.check_circle,
+                  color: AddressColors.primary,
+                  size: 22,
+                ),
               ),
           ],
         ),
@@ -245,10 +299,11 @@ class MapLayout extends StatelessWidget {
             child: Image.asset(
               'assets/images/peta_dummy.png',
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const ColoredBox(
+              errorBuilder: (_, _, _) => const ColoredBox(
                 color: Color(0xFFE3E8EF),
                 child: Center(
-                    child: Icon(Icons.map_outlined, size: 64, color: Colors.grey)),
+                  child: Icon(Icons.map_outlined, size: 64, color: Colors.grey),
+                ),
               ),
             ),
           ),
@@ -260,16 +315,24 @@ class MapLayout extends StatelessWidget {
               children: [
                 Container(
                   color: const Color(0xE6FFFFFF),
-                  child: Row(children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back,
-                          color: AddressColors.primary),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    Text(title,
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: AddressColors.primary,
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      Text(
+                        title,
                         style: const TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 16)),
-                  ]),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -277,7 +340,8 @@ class MapLayout extends StatelessWidget {
                     elevation: 3,
                     borderRadius: BorderRadius.circular(12),
                     child: TextField(
-                        decoration: _searchDecoration(searchHint, Colors.white)),
+                      decoration: _searchDecoration(searchHint, Colors.white),
+                    ),
                   ),
                 ),
               ],
@@ -295,21 +359,29 @@ class MapLayout extends StatelessWidget {
                     44,
                     Colors.white,
                     shadow: const [
-                      BoxShadow(color: Color(0x33000000), blurRadius: 6)
+                      BoxShadow(color: Color(0x33000000), blurRadius: 6),
                     ],
-                    child: const Icon(Icons.my_location,
-                        color: AddressColors.primary),
+                    child: const Icon(
+                      Icons.my_location,
+                      color: AddressColors.primary,
+                    ),
                   ),
                 ),
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.fromLTRB(
-                      16, 10, 16, 16 + MediaQuery.of(context).viewInsets.bottom),
+                    16,
+                    10,
+                    16,
+                    16 + MediaQuery.of(context).viewInsets.bottom,
+                  ),
                   decoration: const BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
                     boxShadow: [
-                      BoxShadow(color: Color(0x1A000000), blurRadius: 16)
+                      BoxShadow(color: Color(0x1A000000), blurRadius: 16),
                     ],
                   ),
                   child: SafeArea(
@@ -348,22 +420,22 @@ class _MapPin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _circle(
-            56,
-            const Color(0x260B3C9D),
-            child: _circle(
-              40,
-              AddressColors.primary,
-              border: Border.all(color: Colors.white, width: 3),
-              child: const Icon(Icons.location_on, color: Colors.white, size: 20),
-            ),
-          ),
-          const SizedBox(height: 4),
-          _circle(8, AddressColors.primary),
-        ],
-      );
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      _circle(
+        56,
+        const Color(0x260B3C9D),
+        child: _circle(
+          40,
+          AddressColors.primary,
+          border: Border.all(color: Colors.white, width: 3),
+          child: const Icon(Icons.location_on, color: Colors.white, size: 20),
+        ),
+      ),
+      const SizedBox(height: 4),
+      _circle(8, AddressColors.primary),
+    ],
+  );
 }
 
 class AddressListScreen extends StatefulWidget {
@@ -398,7 +470,8 @@ class _AddressListScreenState extends State<AddressListScreen> {
     final hasil = await Navigator.push<AddressModel>(
       context,
       MaterialPageRoute(
-          builder: (_) => const PilihTempatScreen(alamat: _alamatDummy)),
+        builder: (_) => const PilihTempatScreen(alamat: _alamatDummy),
+      ),
     );
     if (hasil != null && mounted) {
       setState(() {
@@ -422,15 +495,20 @@ class _AddressListScreenState extends State<AddressListScreen> {
           icon: const Icon(Icons.arrow_back, color: AddressColors.primary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Atur Alamat',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+        title: const Text(
+          'Atur Alamat',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
           TextField(
-            decoration: _searchDecoration('Cari Alamat', const Color(0xFFE6E9EF),
-                suffix: const Icon(Icons.mic, size: 20)),
+            decoration: _searchDecoration(
+              'Cari Alamat',
+              const Color(0xFFE6E9EF),
+              suffix: const Icon(Icons.mic, size: 20),
+            ),
           ),
           const SizedBox(height: 12),
           GradientButton(
@@ -447,31 +525,42 @@ class _AddressListScreenState extends State<AddressListScreen> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Row(children: [
-                Icon(Icons.map_rounded, color: Colors.orange, size: 22),
-                Expanded(
-                  child: Text('Pilih dari Peta',
+              child: const Row(
+                children: [
+                  Icon(Icons.map_rounded, color: Colors.orange, size: 22),
+                  Expanded(
+                    child: Text(
+                      'Pilih dari Peta',
                       textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                ),
-                Icon(Icons.chevron_right, size: 20),
-              ]),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Icon(Icons.chevron_right, size: 20),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Alamat Tersimpan',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+              const Text(
+                'Alamat Tersimpan',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+              ),
               GestureDetector(
                 onTap: _bukaPeta,
-                child: const Text('Tambah Baru',
-                    style: TextStyle(
-                        color: AddressColors.primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600)),
+                child: const Text(
+                  'Tambah Baru',
+                  style: TextStyle(
+                    color: AddressColors.primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),
@@ -525,8 +614,10 @@ class PilihTempatScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('Pilih Alamat', style: _grey12),
-            Text('Edit',
-                style: TextStyle(fontSize: 12, color: AddressColors.primary)),
+            Text(
+              'Ubah',
+              style: TextStyle(fontSize: 12, color: AddressColors.primary),
+            ),
           ],
         ),
         const SizedBox(height: 12),
@@ -537,7 +628,9 @@ class PilihTempatScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         GradientButton(
-            text: 'Konfirmasi Lokasi', onPressed: () => _konfirmasi(context)),
+          text: 'Konfirmasi Lokasi',
+          onPressed: () => _konfirmasi(context),
+        ),
       ],
     );
   }
@@ -591,7 +684,7 @@ class _SimpanAlamatScreenState extends State<SimpanAlamatScreen> {
               controller: _namaController,
               style: _bold14,
               decoration: const InputDecoration(
-                hintText: 'Isi Nama Custom',
+                hintText: 'Isi Nama Alamat',
                 isDense: true,
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
