@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'home_screen.dart';
 import 'pesanan_screen.dart';
 import 'profile_screen.dart';
+import 'notification_page.dart';
 
 void main() {
   runApp(const AplikasiLaundry());
@@ -14,18 +15,16 @@ class AppScrollBehavior extends MaterialScrollBehavior {
 
   @override
   Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-        PointerDeviceKind.trackpad,
-        PointerDeviceKind.stylus,
-        PointerDeviceKind.unknown,
-      };
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+    PointerDeviceKind.stylus,
+    PointerDeviceKind.unknown,
+  };
 
   @override
   ScrollPhysics getScrollPhysics(BuildContext context) {
-    return const BouncingScrollPhysics(
-      parent: AlwaysScrollableScrollPhysics(),
-    );
+    return const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics());
   }
 }
 
@@ -66,33 +65,18 @@ class _NavigasiUtamaState extends State<NavigasiUtama> {
       ),
       // Halaman Pesanan
       const HalamanPesanan(),
-      // Halaman Notifikasi (Placeholder Front End)
-      const Scaffold(
-        backgroundColor: Color(0xFFF8F9FA),
-        body: Center(
-          child: Text(
-            'Halaman Notifikasi\n(Segera Hadir)',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, color: Colors.grey),
-          ),
-        ),
-      ),
+      const HalamanNotifikasi(),
       // Halaman Profil
       const HalamanProfil(),
     ];
 
     return Scaffold(
-      body: IndexedStack(
-        index: indexSaatIni,
-        children: daftarHalaman,
-      ),
+      body: IndexedStack(index: indexSaatIni, children: daftarHalaman),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.only(top: 8, bottom: 10),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(32),
-          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.08),
@@ -102,9 +86,7 @@ class _NavigasiUtamaState extends State<NavigasiUtama> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(32),
-          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           child: SizedBox(
             height: 64,
             child: BottomNavigationBar(
