@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'detail_pesanan_screen.dart';
+import 'pembayaran_screen.dart';
 
 class HalamanPesanan extends StatelessWidget {
   const HalamanPesanan({super.key});
@@ -12,7 +13,7 @@ class HalamanPesanan extends StatelessWidget {
   static const List<Map<String, dynamic>> pesananAktif = [
     {
       'id': '#ZF-1200',
-      'layanan': 'Instant • Cuci & Gosok',
+      'layanan': 'Instan • Cuci & Gosok',
       'tanggal': '24 Oktober 2026',
       'status': 'DIANTAR',
       'hijau': true,
@@ -22,11 +23,11 @@ class HalamanPesanan extends StatelessWidget {
       'progres': 0.95,
       'estimasiLabel': 'Estimasi Sampai',
       'estimasi': '7 Menit',
-      'aksi': ['Detail', 'Track'],
+      'aksi': ['Detail', 'Lacak'],
     },
     {
       'id': '#ZF-1234',
-      'layanan': 'Instant • Cuci & Gosok',
+      'layanan': 'Instan • Cuci & Gosok',
       'tanggal': '24 Oktober 2026',
       'status': 'DICUCI',
       'hijau': false,
@@ -40,11 +41,11 @@ class HalamanPesanan extends StatelessWidget {
     },
     {
       'id': '#ZF-2709',
-      'layanan': 'Regular • Cuci Saja',
+      'layanan': 'Reguler • Cuci Saja',
       'tanggal': '24 Oktober 2026',
       'status': 'ANTREAN',
       'hijau': false,
-      'item': '2 Baju • 1 Seprei',
+      'item': '2 Baju • 1 Seprai',
       'berat': '4.6Kg',
       'harga': null,
       'progres': 0.5,
@@ -54,9 +55,9 @@ class HalamanPesanan extends StatelessWidget {
     },
     {
       'id': '#ZF-1227',
-      'layanan': 'Regular • Gosok Saja',
+      'layanan': 'Reguler • Gosok Saja',
       'tanggal': '24 Oktober 2026',
-      'status': 'BAYAR',
+      'status': 'MENUNGGU PEMBAYARAN',
       'hijau': false,
       'item': '7 Celana • 3 Lainnya',
       'berat': '10.2Kg',
@@ -68,7 +69,7 @@ class HalamanPesanan extends StatelessWidget {
     },
     {
       'id': '#ZF-2710',
-      'layanan': 'Regular • Gosok Saja',
+      'layanan': 'Reguler • Gosok Saja',
       'tanggal': '24 Oktober 2026',
       'status': 'DIHITUNG',
       'hijau': false,
@@ -82,24 +83,24 @@ class HalamanPesanan extends StatelessWidget {
     },
     {
       'id': '#ZF-1202',
-      'layanan': 'Instant • Gosok Saja',
+      'layanan': 'Instan • Gosok Saja',
       'tanggal': '24 Oktober 2026',
       'status': 'DIJEMPUT',
       'hijau': false,
-      'item': 'Baju • Sprei',
+      'item': 'Baju • Seprai',
       'berat': '~',
       'harga': null,
       'progres': 0.03,
       'estimasiLabel': 'Estimasi Selesai',
       'estimasi': '24+ jam',
-      'aksi': ['Detail', 'Track'],
+      'aksi': ['Detail', 'Lacak'],
     },
   ];
 
   static const List<Map<String, dynamic>> riwayatPesanan = [
     {
       'id': '#ZF-0101',
-      'layanan': 'Regular • Cuci & Gosok',
+      'layanan': 'Reguler • Cuci & Gosok',
       'tanggal': '24 Oktober 2026',
       'status': 'SELESAI',
       'hijau': true,
@@ -111,7 +112,7 @@ class HalamanPesanan extends StatelessWidget {
     },
     {
       'id': '#ZF-6991',
-      'layanan': 'Regular • Cuci & Gosok',
+      'layanan': 'Reguler • Cuci & Gosok',
       'tanggal': '24 Oktober 2026',
       'status': 'SELESAI',
       'hijau': true,
@@ -123,7 +124,7 @@ class HalamanPesanan extends StatelessWidget {
     },
     {
       'id': '#ZF-5173',
-      'layanan': 'Instant • Gosok Saja',
+      'layanan': 'Instan • Gosok Saja',
       'tanggal': '24 Oktober 2026',
       'status': 'SELESAI',
       'hijau': true,
@@ -135,7 +136,7 @@ class HalamanPesanan extends StatelessWidget {
     },
     {
       'id': '#ZF-1241',
-      'layanan': 'Instant • Cuci Saja',
+      'layanan': 'Instan • Cuci Saja',
       'tanggal': '24 Oktober 2026',
       'status': 'SELESAI',
       'hijau': true,
@@ -151,7 +152,23 @@ class HalamanPesanan extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => HalamanDetailPesanan(pesanan: pesanan),
+        builder: (_) => HalamanDetailPesanan(pesanan: pesanan),
+      ),
+    );
+  }
+
+  void bukaPembayaran(BuildContext context, Map<String, dynamic> pesanan) {
+    final String? harga = pesanan['harga'] as String?;
+    final int total = int.parse(
+      (harga ?? '0').replaceAll(RegExp(r'[^0-9]'), ''),
+    );
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MetodePembayaranScreen(
+          orderId: pesanan['id'] as String,
+          total: total,
+        ),
       ),
     );
   }
@@ -188,7 +205,7 @@ class HalamanPesanan extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              judulBagian('Riwayat pesanan'),
+              judulBagian('Riwayat Pesanan'),
               const SizedBox(height: 14),
               ...riwayatPesanan.map(
                 (pesanan) => Padding(
@@ -332,15 +349,12 @@ class HalamanPesanan extends StatelessWidget {
 
   Widget kartuPesanan(BuildContext context, Map<String, dynamic> pesanan) {
     final bool hijau = pesanan['hijau'] as bool;
-    final Color warnaTitik = hijau
-        ? const Color(0xFF03AF23)
-        : const Color(0xFFFF9800);
-    final Color warnaLatarBadge = hijau
-        ? const Color(0xFFF0FFF3)
-        : const Color(0xFFFFF5E6);
-    final Color warnaGlow = hijau
-        ? const Color(0xFF5CDF63)
-        : const Color(0xFFFF9800);
+    final Color warnaTitik =
+        hijau ? const Color(0xFF03AF23) : const Color(0xFFFF9800);
+    final Color warnaLatarBadge =
+        hijau ? const Color(0xFFF0FFF3) : const Color(0xFFFFF5E6);
+    final Color warnaGlow =
+        hijau ? const Color(0xFF5CDF63) : const Color(0xFFFF9800);
 
     final double? progres = pesanan['progres'] as double?;
     final String? harga = pesanan['harga'] as String?;
@@ -542,8 +556,13 @@ class HalamanPesanan extends StatelessWidget {
                       children: daftarAksi.map((teks) {
                         return Expanded(
                           child: TextButton(
-                            onPressed: () =>
-                                bukaDetailPesanan(context, pesanan),
+                            onPressed: () {
+                              if (teks == 'Bayar') {
+                                bukaPembayaran(context, pesanan);
+                              } else {
+                                bukaDetailPesanan(context, pesanan);
+                              }
+                            },
                             style: TextButton.styleFrom(
                               foregroundColor: warnaBiru,
                               padding: const EdgeInsets.symmetric(vertical: 12),

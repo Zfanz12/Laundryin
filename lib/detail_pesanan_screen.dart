@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'pembayaran_screen.dart';
 
 class HalamanDetailPesanan extends StatelessWidget {
   final Map<String, dynamic> pesanan;
@@ -32,6 +33,7 @@ class HalamanDetailPesanan extends StatelessWidget {
     'DIJEMPUT': 0,
     'DIHITUNG': 1,
     'BAYAR': 2,
+    'MENUNGGU PEMBAYARAN': 2,
     'ANTREAN': 3,
     'DICUCI': 4,
     'DIANTAR': 5,
@@ -39,7 +41,8 @@ class HalamanDetailPesanan extends StatelessWidget {
   };
 
   static const Map<String, String> labelStatus = {
-    'BAYAR': 'PEMBAYARAN',
+    'BAYAR': 'MENUNGGU PEMBAYARAN',
+    'MENUNGGU PEMBAYARAN': 'MENUNGGU PEMBAYARAN',
     'ANTREAN': 'MENGANTRE',
   };
 
@@ -54,7 +57,8 @@ class HalamanDetailPesanan extends StatelessWidget {
 
   String get status => pesanan['status'] as String;
   bool get hijau => pesanan['hijau'] as bool;
-  bool get menungguBayar => status == 'BAYAR';
+  bool get menungguBayar =>
+      status == 'BAYAR' || status == 'MENUNGGU PEMBAYARAN';
   int get tahapAktif => tahapAktifPerStatus[status] ?? 0;
 
   List<String> get daftarAksi =>
@@ -118,7 +122,7 @@ class HalamanDetailPesanan extends StatelessWidget {
     if (index < tahapAktif) {
       switch (index) {
         case 0:
-          return 'Driver telah mengambil pakaian';
+          return 'Kurir telah mengambil pakaian';
         case 1:
           return 'Pakaian selesai dihitung dan ditimbang';
         case 2:
@@ -128,7 +132,7 @@ class HalamanDetailPesanan extends StatelessWidget {
         case 4:
           return 'Pakaian selesai dicuci dan disetrika';
         case 5:
-          return 'Driver telah mengantar pesanan';
+          return 'Kurir telah mengantar pesanan';
         case 6:
           return 'Pesanan telah selesai diterima';
         default:
@@ -139,7 +143,7 @@ class HalamanDetailPesanan extends StatelessWidget {
     if (index == tahapAktif) {
       switch (index) {
         case 0:
-          return 'Driver sedang menuju lokasi penjemputan';
+          return 'Kurir sedang menuju lokasi penjemputan';
         case 1:
           return 'Pakaian sedang dihitung dan ditimbang';
         case 2:
@@ -154,10 +158,10 @@ class HalamanDetailPesanan extends StatelessWidget {
               : 'Pakaian sedang diproses cuci & setrika';
         case 5:
           return (estimasi != null && estimasi != '~')
-              ? 'Driver dalam perjalanan • Tiba dalam $estimasi'
-              : 'Driver sedang mengantar pesanan ke alamat Anda';
+              ? 'Kurir dalam perjalanan • Tiba dalam $estimasi'
+              : 'Kurir sedang mengantar pesanan ke alamat Anda';
         case 6:
-          return 'Driver tiba di lokasi pengantaran';
+          return 'Kurir tiba di lokasi pengantaran';
         default:
           return 'Sedang dalam proses';
       }
@@ -239,7 +243,7 @@ class HalamanDetailPesanan extends StatelessWidget {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          'Detail Order',
+                          'Detail Pesanan',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.plusJakartaSans(
@@ -574,13 +578,13 @@ class HalamanDetailPesanan extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(child: judulKartu('Linimasa Pesanan')),
-                if (daftarAksi.contains('Track'))
+                if (daftarAksi.contains('Track') || daftarAksi.contains('Lacak'))
                   GestureDetector(
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            'Pelacakan pesanan ${pesanan['id']}: Driver sedang aktif dalam rute.',
+                            'Pelacakan pesanan ${pesanan['id']}: Kurir sedang aktif dalam rute.',
                           ),
                           duration: const Duration(seconds: 2),
                         ),
@@ -593,7 +597,7 @@ class HalamanDetailPesanan extends StatelessWidget {
                         vertical: 10,
                       ),
                       child: Text(
-                        'Track',
+                        'Lacak',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -753,7 +757,7 @@ class HalamanDetailPesanan extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      'Total berat',
+                      'Total Berat',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
@@ -854,7 +858,7 @@ class HalamanDetailPesanan extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFFF3F4F6),
+              color: const Color(0xFFF3F4F5),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -909,7 +913,7 @@ class HalamanDetailPesanan extends StatelessWidget {
           const SizedBox(height: 16),
           barisHarga('Subtotal', teksSubtotal),
           const SizedBox(height: 12),
-          barisHarga('Delivery', teksDelivery),
+          barisHarga('Ongkos Kirim', teksDelivery),
           const SizedBox(height: 14),
           Container(height: 1, color: const Color(0xFFF0F1F2)),
           const SizedBox(height: 14),
@@ -1008,15 +1012,16 @@ class HalamanDetailPesanan extends StatelessWidget {
 
   Widget tombolPembayaran(BuildContext context, bool hargaSudahAda) {
     if (menungguBayar) {
-      return GestureDetector(
+      return TombolBayarAnimasi(
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Pembayaran ${pesanan['id']} sebesar ${pesanan['harga']} berhasil dikonfirmasi.',
+          final total = totalHarga ?? 0;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => MetodePembayaranScreen(
+                orderId: pesanan['id'] as String,
+                total: total,
               ),
-              backgroundColor: warnaBiru,
-              duration: const Duration(seconds: 2),
             ),
           );
         },
@@ -1065,6 +1070,42 @@ class HalamanDetailPesanan extends StatelessWidget {
               : const Color(0xFFC4C7CC),
           letterSpacing: 1.0,
         ),
+      ),
+    );
+  }
+}
+
+class TombolBayarAnimasi extends StatefulWidget {
+  final VoidCallback onTap;
+  final Widget child;
+
+  const TombolBayarAnimasi({
+    super.key,
+    required this.onTap,
+    required this.child,
+  });
+
+  @override
+  State<TombolBayarAnimasi> createState() => _TombolBayarAnimasiState();
+}
+
+class _TombolBayarAnimasiState extends State<TombolBayarAnimasi> {
+  bool _ditekan = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _ditekan = true),
+      onTapUp: (_) {
+        setState(() => _ditekan = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _ditekan = false),
+      child: AnimatedScale(
+        scale: _ditekan ? 0.94 : 1.0,
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOutCubic,
+        child: widget.child,
       ),
     );
   }

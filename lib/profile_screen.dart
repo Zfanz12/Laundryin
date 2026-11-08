@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'alamat_screen.dart';
 
-// Halaman profil pengguna
 class HalamanProfil extends StatefulWidget {
   const HalamanProfil({super.key});
 
@@ -12,41 +11,36 @@ class HalamanProfil extends StatefulWidget {
 }
 
 class _HalamanProfilState extends State<HalamanProfil> {
-  // Variabel untuk animasi tahan (hold) tombol logout
   Timer? timerTahanLogout;
   double progresTahanLogout = 0.0;
   bool sedangMenahanLogout = false;
 
-  // Indeks menu yang sedang ditekan untuk animasi sentuh
-  int? indeksMenuDitekan;
-
-  // Fungsi saat tombol logout mulai ditekan dan ditahan
   void mulaiTahanLogout() {
     setState(() {
       sedangMenahanLogout = true;
       progresTahanLogout = 0.0;
     });
 
-    // Setiap 20 milidetik, tambahkan progres sedikit demi sedikit (selesai dalam 1.1 detik)
+    timerTahanLogout?.cancel();
     timerTahanLogout = Timer.periodic(const Duration(milliseconds: 20), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
       setState(() {
-        progresTahanLogout += 0.02;
+        progresTahanLogout += 0.025;
         if (progresTahanLogout >= 1.0) {
           progresTahanLogout = 1.0;
           timer.cancel();
           sedangMenahanLogout = false;
-          // Tampilkan dialog konfirmasi logout langsung saat hold selesai
           tampilkanDialogKonfirmasiLogout();
         }
       });
     });
   }
 
-  // Fungsi saat tombol logout dilepas sebelum selesai ditahan
   void batalTahanLogout() {
-    if (timerTahanLogout != null) {
-      timerTahanLogout!.cancel();
-    }
+    timerTahanLogout?.cancel();
     setState(() {
       sedangMenahanLogout = false;
       progresTahanLogout = 0.0;
@@ -70,23 +64,18 @@ class _HalamanProfilState extends State<HalamanProfil> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Header Halaman
               bagianHeader(),
               const SizedBox(height: 24),
 
-              // 2. Foto Profil, Nama, dan Nomor HP
               bagianProfilUtama(),
               const SizedBox(height: 32),
 
-              // 3. Menu Pengaturan Profil
               bagianMenuProfil(),
               const SizedBox(height: 32),
 
-              // 4. Tombol Logout dengan Animasi Tahan (Hold)
               bagianTombolLogout(),
               const SizedBox(height: 18),
 
-              // 5. Teks Versi Aplikasi
               bagianVersiAplikasi(),
               const SizedBox(height: 20),
             ],
@@ -96,7 +85,6 @@ class _HalamanProfilState extends State<HalamanProfil> {
     );
   }
 
-  // 1. Header Teks Profil
   Widget bagianHeader() {
     return Text(
       'Profil',
@@ -109,12 +97,10 @@ class _HalamanProfilState extends State<HalamanProfil> {
     );
   }
 
-  // 2. Bagian Foto Profil Utama, Nama, dan Nomor Handphone
   Widget bagianProfilUtama() {
     return Center(
       child: Column(
         children: [
-          // Lingkaran foto profil dengan border gradient biru dan bayangan glow
           Container(
             width: 120,
             height: 120,
@@ -163,7 +149,6 @@ class _HalamanProfilState extends State<HalamanProfil> {
             ),
           ),
           const SizedBox(height: 16),
-          // Nama Pengguna
           Text(
             'Zulfan Falah',
             style: GoogleFonts.plusJakartaSans(
@@ -174,7 +159,6 @@ class _HalamanProfilState extends State<HalamanProfil> {
             ),
           ),
           const SizedBox(height: 4),
-          // Nomor Telepon Pengguna
           Text(
             '+6281214714735',
             style: GoogleFonts.plusJakartaSans(
@@ -188,11 +172,9 @@ class _HalamanProfilState extends State<HalamanProfil> {
     );
   }
 
-  // 3. Bagian Daftar Menu Profil
   Widget bagianMenuProfil() {
     return Column(
       children: [
-        // Menu 1: Alamat Tersimpan
         itemMenu(
           
           indeks: 0,
@@ -215,7 +197,6 @@ class _HalamanProfilState extends State<HalamanProfil> {
 
         
 
-        // Menu 2: Edit Profil
         itemMenu(
           indeks: 1,
           judul: 'Edit Profil',
@@ -225,7 +206,6 @@ class _HalamanProfilState extends State<HalamanProfil> {
         ),
         const SizedBox(height: 14),
 
-        // Menu 3: Keamanan Akun
         itemMenu(
           indeks: 2,
           judul: 'Keamanan Akun',
@@ -235,7 +215,6 @@ class _HalamanProfilState extends State<HalamanProfil> {
         ),
         const SizedBox(height: 14),
 
-        // Menu 4: Bahasa
         itemMenu(
           indeks: 3,
           judul: 'Bahasa',
@@ -246,7 +225,6 @@ class _HalamanProfilState extends State<HalamanProfil> {
         ),
         const SizedBox(height: 14),
 
-        // Menu 5: Bantuan & Laporan
         itemMenu(
           indeks: 4,
           judul: 'Bantuan & Laporan',
@@ -259,7 +237,6 @@ class _HalamanProfilState extends State<HalamanProfil> {
     
   }
 
-  // Desain kartu untuk setiap baris menu dengan animasi sentuh (tanpa snackbar)
   Widget itemMenu({
     required int indeks,
     required String judul,
@@ -269,117 +246,92 @@ class _HalamanProfilState extends State<HalamanProfil> {
     required Color warnaLatarIkon,
     VoidCallback? onTap,
   }) {
-    final bool sedangDitekan = (indeksMenuDitekan == indeks);
-
     return GestureDetector(
       onTap: onTap,
-      onTapDown: (_) {
-        setState(() {
-          indeksMenuDitekan = indeks;
-        });
-      },
-      onTapUp: (_) {
-        setState(() {
-          indeksMenuDitekan = null;
-        });
-      },
-      onTapCancel: () {
-        setState(() {
-          indeksMenuDitekan = null;
-        });
-      },
-      child: AnimatedScale(
-        scale: sedangDitekan ? 0.98 : 1.0,
-        duration: const Duration(milliseconds: 120),
-        curve: Curves.easeInOut,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 14,
-                offset: const Offset(0, 4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: warnaLatarIkon,
+                borderRadius: BorderRadius.circular(16),
               ),
-            ],
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Kotak Ikon Menu
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: warnaLatarIkon,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(
-                  ikon,
-                  color: warnaIkon,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 14),
-              // Teks Judul dan Subjudul
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      judul,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF191C1D),
-                      ),
-                    ),
-                    if (subjudul != null) ...[
-                      const SizedBox(height: 3),
-                      Text(
-                        subjudul,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xFF646E77),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              // Panah ke kanan
-              const Icon(
-                Icons.chevron_right_rounded,
-                color: Color(0xFFA3A3A3),
+              child: Icon(
+                ikon,
+                color: warnaIkon,
                 size: 22,
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    judul,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF191C1D),
+                    ),
+                  ),
+                  if (subjudul != null) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      subjudul,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF646E77),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: Color(0xFFA3A3A3),
+              size: 22,
+            ),
+          ],
         ),
       ),
     );
   }
 
-  // 4. Tombol Logout dengan Animasi Tahan (Hold) Tanpa SnackBar
   Widget bagianTombolLogout() {
     return GestureDetector(
-      // Mulai tahan
       onTapDown: (_) => mulaiTahanLogout(),
       onTapUp: (_) {
         if (progresTahanLogout < 1.0) {
           batalTahanLogout();
+          tampilkanDialogKonfirmasiLogout();
         }
       },
       onTapCancel: () => batalTahanLogout(),
       child: AnimatedScale(
-        scale: sedangMenahanLogout ? 0.96 : 1.0,
-        duration: const Duration(milliseconds: 120),
+        scale: sedangMenahanLogout ? 0.95 : 1.0,
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOutCubic,
         child: Container(
           width: double.infinity,
           height: 52,
@@ -404,7 +356,6 @@ class _HalamanProfilState extends State<HalamanProfil> {
           ),
           child: Stack(
             children: [
-              // Efek bar pengisi animasi saat tombol sedang ditahan
               if (sedangMenahanLogout)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(9999),
@@ -419,7 +370,6 @@ class _HalamanProfilState extends State<HalamanProfil> {
                     ),
                   ),
                 ),
-              // Ikon dan Teks Logout
               Center(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -431,7 +381,7 @@ class _HalamanProfilState extends State<HalamanProfil> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      sedangMenahanLogout ? 'Tahan...' : 'Logout',
+                      sedangMenahanLogout ? 'Tahan...' : 'Keluar',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -448,11 +398,10 @@ class _HalamanProfilState extends State<HalamanProfil> {
     );
   }
 
-  // 5. Teks Versi Aplikasi di Bagian Paling Bawah
   Widget bagianVersiAplikasi() {
     return Center(
       child: Text(
-        'VERSION 12.02.06 (BUILD 420)',
+        'VERSI 12.02.06 (BUILD 420)',
         style: GoogleFonts.plusJakartaSans(
           fontSize: 11,
           fontWeight: FontWeight.w600,
@@ -463,7 +412,6 @@ class _HalamanProfilState extends State<HalamanProfil> {
     );
   }
 
-  // Modal dialog konfirmasi keluar saat tombol hold selesai ditahan
   void tampilkanDialogKonfirmasiLogout() {
     showModalBottomSheet(
       context: context,
@@ -501,7 +449,7 @@ class _HalamanProfilState extends State<HalamanProfil> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Konfirmasi Logout',
+                'Konfirmasi Keluar',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 19,
                   fontWeight: FontWeight.w700,

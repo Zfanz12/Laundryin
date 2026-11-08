@@ -128,7 +128,7 @@ class _AddressRow extends StatelessWidget {
   );
 }
 
-class GradientButton extends StatelessWidget {
+class GradientButton extends StatefulWidget {
   final String text;
   final IconData? icon;
   final VoidCallback? onPressed;
@@ -140,37 +140,56 @@ class GradientButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => Material(
-    color: Colors.transparent,
-    borderRadius: BorderRadius.circular(16),
-    clipBehavior: Clip.antiAlias,
-    child: Ink(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AddressColors.primaryLight, AddressColors.primary],
-        ),
-      ),
-      child: InkWell(
-        onTap: onPressed,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (icon != null) ...[
-                Icon(icon, color: Colors.white, size: 18),
-                const SizedBox(width: 8),
-              ],
-              Text(
-                text,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
+  State<GradientButton> createState() => _GradientButtonState();
+}
+
+class _GradientButtonState extends State<GradientButton> {
+  bool _ditekan = false;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+    onTapDown: widget.onPressed != null ? (_) => setState(() => _ditekan = true) : null,
+    onTapUp: widget.onPressed != null
+        ? (_) {
+            setState(() => _ditekan = false);
+            widget.onPressed?.call();
+          }
+        : null,
+    onTapCancel: widget.onPressed != null ? () => setState(() => _ditekan = false) : null,
+    child: AnimatedScale(
+      scale: _ditekan ? 0.95 : 1.0,
+      duration: const Duration(milliseconds: 140),
+      curve: Curves.easeOutCubic,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
+        child: Ink(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AddressColors.primaryLight, AddressColors.primary],
+            ),
+          ),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (widget.icon != null) ...[
+                  Icon(widget.icon, color: Colors.white, size: 18),
+                  const SizedBox(width: 8),
+                ],
+                Text(
+                  widget.text,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -596,7 +615,7 @@ class PilihTempatScreen extends StatelessWidget {
           children: [
             Text('Pilih Alamat', style: _grey12),
             Text(
-              'Edit',
+              'Ubah',
               style: TextStyle(fontSize: 12, color: AddressColors.primary),
             ),
           ],
@@ -665,7 +684,7 @@ class _SimpanAlamatScreenState extends State<SimpanAlamatScreen> {
               controller: _namaController,
               style: _bold14,
               decoration: const InputDecoration(
-                hintText: 'Isi Nama Custom',
+                hintText: 'Isi Nama Alamat',
                 isDense: true,
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
